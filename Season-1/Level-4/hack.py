@@ -11,6 +11,7 @@ the tests.py again to recreate it.
 
 import unittest
 import code as c
+import sqlite3
 
 # code.py has 5 methods namely:
 # (1) get_stock_info
@@ -51,3 +52,16 @@ class TestDatabase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+con = sqlite3.connect('example.db')
+user_input = "Mary'); DROP TABLE Users;--"
+sql_stmt = "INSERT INTO Users (user) VALUES ('" + user_input + "');"
+con.executescript(sql_stmt)
+
+# Secure through Parameterized Statements
+con = sqlite3.connect('example.db')
+user_input = "Mary'); DROP TABLE Users;--"
+# The secure way to query a database is
+con.execute("INSERT INTO Users (user) VALUES (?)", (user_input,))
+
+
