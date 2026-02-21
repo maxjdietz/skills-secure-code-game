@@ -18,6 +18,18 @@ const fs = require("fs");
 const { exec } = require("node:child_process");
 const app = express();
 
+function escapeHtml(unsafe) {
+  if (typeof unsafe !== "string") {
+    return "";
+  }
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: "application/xml" }));
 
@@ -87,7 +99,10 @@ app.post("/ufo", (req, res) => {
       }
     } catch (error) {
       console.error("XML parsing or validation error:", error.message);
-      res.status(400).send("Invalid XML: " + error.message);
+      res
+        .status(400)
+        .set("Content-Type", "text/plain")
+        .send("Invalid XML: " + escapeHtml(error.message));
     }
   } else {
     res.status(405).send("Unsupported content type");
